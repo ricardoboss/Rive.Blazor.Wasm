@@ -1,0 +1,36 @@
+﻿@page "/"
+
+@code {
+
+	private int size = 500;
+
+}
+
+<PageTitle>Home</PageTitle>
+
+<input type="range" min="0" max="1000" step="50" @bind="size" @bind:event="oninput"/>
+<br/>
+
+<RivePlayer
+	File="https://cdn.rive.app/animations/vehicles.riv"
+	Width="size"
+	Height="size"
+	Autoplay
+	StateMachines="bumpy"
+/>
+
+<RivePlayer
+	File="https://cdn.rive.app/animations/vehicles.riv"
+	Width="size"
+	Height="size"
+	Autoplay
+	StateMachines="bumpy"
+/>
+
+<RivePlayer
+	File="https://cdn.rive.app/animations/vehicles.riv"
+	Width="size"
+	Height="size"
+	Autoplay
+	StateMachines="bumpy"
+/>

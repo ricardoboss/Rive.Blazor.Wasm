@@ -1,0 +1,99 @@
+﻿@using Microsoft.JSInterop
+@inject IJSRuntime JsRuntime;
+
+@implements IAsyncDisposable
+
+@code {
+
+	private static bool scriptEmitted = false;
+	private static bool libraryLoaded = false;
+
+	[Parameter]
+	public int? Width { get; set; }
+
+	[Parameter]
+	public int? Height { get; set; }
+
+	[Parameter]
+	public string? File { get; set; }
+
+	[Parameter]
+	public bool Autoplay { get; set; }
+
+	[Parameter]
+	public string? Artboard { get; set; }
+
+	[Parameter]
+	public string? StateMachines { get; set; }
+
+	[Parameter(CaptureUnmatchedValues = true)]
+	public Dictionary<string, object>? Attributes { get; set; }
+
+	private ElementReference canvas;
+
+	private IJSObjectReference? rivePlayer;
+
+	private bool firstRendered = false;
+
+	private async Task OnRiveLibraryLoaded()
+	{
+		libraryLoaded = true;
+
+		await InitializeCanvas();
+	}
+
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		scriptEmitted = true;
+		firstRendered = true;
+
+		await InitializeCanvas();
+	}
+
+	private async Task InitializeCanvas()
+	{
+		if (!libraryLoaded)
+			return;
+
+		if (!firstRendered)
+			return;
+
+		rivePlayer = await JsRuntime.InvokeAsync<IJSObjectReference>("initializeRivePlayer", File, canvas, Autoplay, Artboard, StateMachines);
+	}
+
+	public async ValueTask DisposeAsync()
+	{
+		if (rivePlayer != null)
+		{
+			await rivePlayer.InvokeVoidAsync("cleanup");
+
+			await rivePlayer.DisposeAsync();
+		}
+	}
+
+}
+
+@if (!scriptEmitted)
+{
+	<script src="https://unpkg.com/@@rive-app/canvas-lite@latest" @onload="OnRiveLibraryLoaded" async defer></script>
+	<script>
+		function initializeRivePlayer(src, canvas, autoplay, artboard, stateMachines) {
+			// noinspection JSUnresolvedReference
+			const r = new rive.Rive({
+				src,
+				canvas,
+				autoplay,
+				artboard,
+				stateMachines,
+				onLoad: () => {
+					// noinspection JSUnresolvedReference
+					r.resizeDrawingSurfaceToCanvas();
+				},
+			});
+
+			return r;
+		}
+	</script>
+}
+
+<canvas @ref="canvas" width="@Width" height="@Height" @attributes="Attributes"></canvas>

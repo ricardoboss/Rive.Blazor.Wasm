@@ -1,0 +1,62 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<SupportedPlatform Include="browser"/>
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="8.0.8"/>
+		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
+
+	<PropertyGroup Condition="'$(Configuration)' == 'Release'">
+		<Title>Rive.Blazor.Wasm</Title>
+		<Description>A Blazor component for Rive animations.</Description>
+		<PackageTags>blazor;rive;animation;wasm;canvas</PackageTags>
+
+		<Version>1.0.0</Version>
+
+		<Authors>Ricardo Boss</Authors>
+		<Copyright>Copyright (c) 2024 Ricardo Boss</Copyright>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<PackageProjectUrl>https://github.com/ricardoboss/Rive.Blazor.Wasm</PackageProjectUrl>
+
+		<RepositoryUrl>https://github.com/ricardoboss/Rive.Blazor.Wasm</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<!-- needed for Source Link -->
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+
+		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+
+		<RunAOTCompilation>true</RunAOTCompilation>
+
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	</PropertyGroup>
+
+	<Target Name="PreparePackageReleaseNotesFromFile" BeforeTargets="GenerateNuspec">
+		<ReadLinesFromFile File="../CHANGELOG.md">
+			<Output TaskParameter="Lines" ItemName="ReleaseNoteLines"/>
+		</ReadLinesFromFile>
+		<PropertyGroup>
+			<PackageReleaseNotes>@(ReleaseNoteLines, '%0a')</PackageReleaseNotes>
+		</PropertyGroup>
+	</Target>
+
+	<ItemGroup Condition="'$(Configuration)' == 'Release'">
+		<None Include="..\LICENSE.md" Pack="true" PackagePath="\"/>
+		<None Include="..\README.md" Pack="true" PackagePath="\"/>
+	</ItemGroup>
+</Project>
